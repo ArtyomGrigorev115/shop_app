@@ -6,7 +6,7 @@ class Product {
   final String imageUrl;
   bool isFavorite;
 
-  Product({
+   Product({
     required this.id,
     required this.title,
     required this.description,
