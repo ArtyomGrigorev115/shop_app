@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 
 import 'package:shopapp/widgets/product_item.dart';
 
-import '../models/product.dart';
+import '../providers/product.dart';
 import '../providers/products_provider.dart';
 
 class ProductsGrid extends StatelessWidget {
@@ -23,11 +23,13 @@ class ProductsGrid extends StatelessWidget {
     return GridView.builder(
       padding: const EdgeInsets.all(10.0),
       itemCount: products.length,
-      itemBuilder: (ctx, item) => ProductItem(
-        id: products[item].id,
-        title: products[item].title,
-        imageUrl: products[item].imageUrl,
-      ),
+      itemBuilder: (ctx, item) => ChangeNotifierProvider(
+        create: (BuildContext context) => products[item],
+        child:  ProductItem(
+        // id: products[item].id,
+        // title: products[item].title,
+        // imageUrl: products[item].imageUrl,
+      ) , ),
       gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
         crossAxisCount: 2,
         childAspectRatio: 3 / 2,
