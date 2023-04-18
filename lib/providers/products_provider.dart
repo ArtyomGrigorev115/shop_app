@@ -3,6 +3,8 @@ import 'package:flutter/material.dart';
 import 'product.dart';
 
 class ProductsProvider with ChangeNotifier{
+
+  /* временный Список с товарами для дизайна виджета товаров*/
   List<Product> _items = [
     Product(
       id: 'p1',
@@ -39,14 +41,33 @@ class ProductsProvider with ChangeNotifier{
 
   ];
 
+  bool _showFavoritiesOnly = false;
+
   /*Возвращает копию списка товаров*/
   List<Product> get items{
+    // if(_showFavoritiesOnly){
+    //   return _items.where((productItem) => productItem.isFavorite).toList();
+    // }
     return [..._items];
+  }
+
+  List<Product> get favoriteItems {
+    return _items.where((productItem) => productItem.isFavorite).toList();
   }
 
   Product findById(String id){
     return _items.firstWhere((product) => product.id == id);
   }
+
+  // void showFavoritesOnly(){
+  //   _showFavoritiesOnly = true;
+  //   notifyListeners();
+  // }
+  //
+  // void showAll(){
+  //   _showFavoritiesOnly = false;
+  //   notifyListeners();
+  // }
 
   void addProduct(){
    // _items.add(value);
