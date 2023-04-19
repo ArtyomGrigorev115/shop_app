@@ -37,6 +37,18 @@ class CartItem extends StatelessWidget {
         ),
       ),
       direction: DismissDirection.endToStart,
+      confirmDismiss: (direction){
+        return showDialog(
+            context: context,
+            builder: (ctx) => AlertDialog(
+              title: Text('точно удалить?'),
+              content: Text('Удалить элемент из корзины?'),
+              actions: [
+                TextButton(onPressed: ()=>Navigator.of(ctx).pop(false), child: Text('Нет'),),
+                TextButton(onPressed: ()=> Navigator.of(ctx).pop(true), child: Text('Да'),),
+              ],
+            ),);
+      },
       onDismissed: (direction){
         Provider.of<Cart>(context, listen: false).removeItem(productId);
       },
