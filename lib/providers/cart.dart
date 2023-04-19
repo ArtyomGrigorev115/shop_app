@@ -22,13 +22,23 @@ class Cart with ChangeNotifier {
   }
 
   int get itemCount{
+    print(_items.length);
     return _items.length;
+  }
+
+  double get totalAmount{
+    double total = 0.0;
+    _items.forEach((key, cartItem) {
+      total += cartItem.price * cartItem.quantity;
+    });
+    return total;
   }
 
   void addItem(String productId, double price, String title){
 
       if(_items.containsKey(productId)){
         //Увеличить кол-во товара
+        print('Увеличиваем товар');
         _items.update(
             productId,
                 (existingCarItem) => CartItem(
@@ -38,8 +48,10 @@ class Cart with ChangeNotifier {
                     price: existingCarItem.price
                 ),
         );
-      }
+        print('koл-во товара ${_items[productId]?.quantity}');
+    }
       else{
+        print('Добавляем новый');
         _items.putIfAbsent(
             productId,
                 () => CartItem(
