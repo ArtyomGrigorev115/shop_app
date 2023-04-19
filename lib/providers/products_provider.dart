@@ -69,8 +69,14 @@ class ProductsProvider with ChangeNotifier{
   //   notifyListeners();
   // }
 
-  void addProduct(){
+  void addProduct(Product product){
    // _items.add(value);
+    final newProduct = Product(
+        id: id,
+        title: title,
+        description: description,
+        price: price,
+        imageUrl: imageUrl);
     notifyListeners(); //Обновить слушатели
   }
 
