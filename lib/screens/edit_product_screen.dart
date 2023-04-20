@@ -34,6 +34,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
   };
 
   bool _isInit = true;
+  bool _isLoading = false;
 
   @override
   void initState() {
@@ -101,6 +102,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
       return;
     }
     _form.currentState?.save();
+    setState(() {
+      _isLoading = true;
+    });
+
    /* print(_editedProduct.title);
     print(_editedProduct.description);
     print(_editedProduct.price);
@@ -109,13 +114,41 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     //обновить существующий товар, а не добавлять новый такой же
     if(_editedProduct.id.isNotEmpty){
-      Provider.of<ProductsProvider>(context, listen: false).updateProduct(_editedProduct.id, _editedProduct);
+      Provider
+          .of<ProductsProvider>(context, listen: false)
+          .updateProduct(_editedProduct.id, _editedProduct);
+      setState(() {
+        _isLoading = false;
+      });
+      Navigator.of(context).pop();
     }
     else{
-      Provider.of<ProductsProvider>(context, listen: false).addProduct(_editedProduct);
+      Provider
+          .of<ProductsProvider>(context, listen: false)
+          .addProduct(_editedProduct) //return Future<void>
+          .catchError((onError){ //перехватываем возможное исключений из ProductProvider
+          return showDialog<Null>(
+                context: context,
+                builder: (builderContext) => AlertDialog(
+                  title: Text('Произошла ошибка'),
+                  content: Text('Что-то пошло не так :( ${onError.toString()}'),
+                  actions: [
+                    TextButton(
+                        onPressed: () => Navigator.of(builderContext).pop(),
+                        child: Text('Ок'),),
+                  ],
+                )
+            );
+      })
+          .then((_){
+        setState(() {
+          _isLoading = false;
+        });
+        Navigator.of(context).pop();
+      });
     }
 
-    Navigator.of(context).pop();
+    // Navigator.of(context).pop();
   }
 
   @override
@@ -130,7 +163,9 @@ class _EditProductScreenState extends State<EditProductScreen> {
           ),
         ],
       ),
-      body: Padding(
+      body: _isLoading
+          ? Center(child: CircularProgressIndicator(),)
+          : Padding(
         padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _form,

@@ -69,11 +69,11 @@ class ProductsProvider with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  void addProduct(Product product) {
+  Future<void> addProduct(Product product) {
     //final url = Uri.http('shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app','/products.json');
     final Uri url = Uri.parse(
         'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json');
-    http
+    return http
         .post(url,
             body: json.encode({
               'title': product.title,
@@ -83,9 +83,10 @@ class ProductsProvider with ChangeNotifier {
               'isFavorite': product.isFavorite,
             }))
         .then((response) {
-          print(json.decode(response.body)); //{name: -key}
+      print(json.decode(response.body)); //{name: -key}
       final newProduct = Product(
-          id: json.decode(response.body)['name'], //ункальный id, сгенерированный сервером
+          id: json.decode(response.body)['name'],
+          //ункальный id, сгенерированный сервером
           title: product.title,
           description: product.description,
           price: product.price,
@@ -93,6 +94,9 @@ class ProductsProvider with ChangeNotifier {
       _items.add(newProduct);
       //_items.insert(0, newProduct);
       notifyListeners(); //Обновить слушатели
+    }).catchError((error){
+      print(error);
+      throw error; //пробрасываем исключение в EditProductScreen
     });
   }
 
@@ -111,3 +115,5 @@ class ProductsProvider with ChangeNotifier {
     notifyListeners();
   }
 }
+
+//
