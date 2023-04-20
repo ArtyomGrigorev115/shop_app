@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'dart:convert';
+import 'package:http/http.dart' as http;
 
 import 'product.dart';
 
@@ -68,16 +70,30 @@ class ProductsProvider with ChangeNotifier {
   // }
 
   void addProduct(Product product) {
-    // _items.add(value);
-    final newProduct = Product(
-        id: DateTime.now().toString(),
-        title: product.title,
-        description: product.description,
-        price: product.price,
-        imageUrl: product.imageUrl);
-    _items.add(newProduct);
-    //_items.insert(0, newProduct);
-    notifyListeners(); //Обновить слушатели
+    //final url = Uri.http('shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app','/products.json');
+    final Uri url = Uri.parse(
+        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+    http
+        .post(url,
+            body: json.encode({
+              'title': product.title,
+              'description': product.description,
+              'imageUrl': product.imageUrl,
+              'price': product.price,
+              'isFavorite': product.isFavorite,
+            }))
+        .then((response) {
+          print(json.decode(response.body)); //{name: -key}
+      final newProduct = Product(
+          id: json.decode(response.body)['name'], //ункальный id, сгенерированный сервером
+          title: product.title,
+          description: product.description,
+          price: product.price,
+          imageUrl: product.imageUrl);
+      _items.add(newProduct);
+      //_items.insert(0, newProduct);
+      notifyListeners(); //Обновить слушатели
+    });
   }
 
   void updateProduct(String id, Product newProduct) {
@@ -89,7 +105,8 @@ class ProductsProvider with ChangeNotifier {
       print('........');
     }
   }
-  void deleteProduct(String id){
+
+  void deleteProduct(String id) {
     _items.removeWhere((product) => product.id == id);
     notifyListeners();
   }
