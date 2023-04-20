@@ -2,8 +2,7 @@ import 'package:flutter/material.dart';
 
 import 'product.dart';
 
-class ProductsProvider with ChangeNotifier{
-
+class ProductsProvider with ChangeNotifier {
   /* временный Список с товарами для дизайна виджета товаров*/
   List<Product> _items = [
     Product(
@@ -12,7 +11,7 @@ class ProductsProvider with ChangeNotifier{
       description: 'Просто мышка для ПК',
       price: 29.99,
       imageUrl:
-      'https://live.staticflickr.com/65535/50124850593_c80347ae94_z.jpg',
+          'https://live.staticflickr.com/65535/50124850593_c80347ae94_z.jpg',
     ),
     Product(
       id: 'p2',
@@ -20,7 +19,7 @@ class ProductsProvider with ChangeNotifier{
       description: 'Хорошая пара брюк.',
       price: 59.99,
       imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/e/e8/Trousers%2C_dress_%28AM_1960.022-8%29.jpg/512px-Trousers%2C_dress_%28AM_1960.022-8%29.jpg',
     ),
     Product(
       id: 'p3',
@@ -28,7 +27,7 @@ class ProductsProvider with ChangeNotifier{
       description: 'Теплый и уютный - именно то, что вам нужно для зимы.',
       price: 19.99,
       imageUrl:
-      'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
+          'https://live.staticflickr.com/4043/4438260868_cc79b3369d_z.jpg',
     ),
     Product(
       id: 'p4',
@@ -36,15 +35,14 @@ class ProductsProvider with ChangeNotifier{
       description: 'Приготовьте любую еду, которую вы хотите.',
       price: 49.99,
       imageUrl:
-      'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
+          'https://upload.wikimedia.org/wikipedia/commons/thumb/1/14/Cast-Iron-Pan.jpg/1024px-Cast-Iron-Pan.jpg',
     ),
-
   ];
 
   bool _showFavoritiesOnly = false;
 
   /*Возвращает копию списка товаров*/
-  List<Product> get items{
+  List<Product> get items {
     // if(_showFavoritiesOnly){
     //   return _items.where((productItem) => productItem.isFavorite).toList();
     // }
@@ -55,7 +53,7 @@ class ProductsProvider with ChangeNotifier{
     return _items.where((productItem) => productItem.isFavorite).toList();
   }
 
-  Product findById(String id){
+  Product findById(String id) {
     return _items.firstWhere((product) => product.id == id);
   }
 
@@ -69,8 +67,8 @@ class ProductsProvider with ChangeNotifier{
   //   notifyListeners();
   // }
 
-  void addProduct(Product product){
-   // _items.add(value);
+  void addProduct(Product product) {
+    // _items.add(value);
     final newProduct = Product(
         id: DateTime.now().toString(),
         title: product.title,
@@ -82,4 +80,17 @@ class ProductsProvider with ChangeNotifier{
     notifyListeners(); //Обновить слушатели
   }
 
+  void updateProduct(String id, Product newProduct) {
+    final prodIndex = _items.indexWhere((product) => product.id == id);
+    if (prodIndex >= 0) {
+      _items[prodIndex] = newProduct;
+      notifyListeners();
+    } else {
+      print('........');
+    }
+  }
+  void deleteProduct(String id){
+    _items.removeWhere((product) => product.id == id);
+    notifyListeners();
+  }
 }
