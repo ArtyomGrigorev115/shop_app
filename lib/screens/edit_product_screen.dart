@@ -96,7 +96,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
     }
   }
 
-  void _saveForm(){
+  Future<void> _saveForm() async {
     final isValid =  _form.currentState?.validate();
     if(!isValid!){
       return;
@@ -123,29 +123,55 @@ class _EditProductScreenState extends State<EditProductScreen> {
       Navigator.of(context).pop();
     }
     else{
-      Provider
-          .of<ProductsProvider>(context, listen: false)
-          .addProduct(_editedProduct) //return Future<void>
-          .catchError((onError){ //перехватываем возможное исключений из ProductProvider
-          return showDialog<Null>(
-                context: context,
-                builder: (builderContext) => AlertDialog(
-                  title: Text('Произошла ошибка'),
-                  content: Text('Что-то пошло не так :( ${onError.toString()}'),
-                  actions: [
-                    TextButton(
-                        onPressed: () => Navigator.of(builderContext).pop(),
-                        child: Text('Ок'),),
-                  ],
-                )
-            );
-      })
-          .then((_){
+      try{
+        await Provider
+            .of<ProductsProvider>(context, listen: false)
+            .addProduct(_editedProduct); //return Future<void>
+      }
+      catch(error){
+         await showDialog<Null>(
+            context: context,
+            builder: (builderContext) => AlertDialog(
+              title: Text('Произошла ошибка'),
+              content: Text('Что-то пошло не так :( '),
+              actions: [
+                TextButton(
+                  onPressed: () => Navigator.of(builderContext).pop(),
+                  child: Text('Ок'),),
+              ],
+            )
+        );
+      }
+      finally{
         setState(() {
           _isLoading = false;
         });
         Navigator.of(context).pop();
-      });
+      }
+      // await Provider
+      //     .of<ProductsProvider>(context, listen: false)
+      //     .addProduct(_editedProduct) //return Future<void>
+      //     .catchError((onError){ //перехватываем возможное исключений из ProductProvider
+      //     return showDialog<Null>(
+      //           context: context,
+      //           builder: (builderContext) => AlertDialog(
+      //             title: Text('Произошла ошибка'),
+      //             content: Text('Что-то пошло не так :( ${onError.toString()}'),
+      //             actions: [
+      //               TextButton(
+      //                   onPressed: () => Navigator.of(builderContext).pop(),
+      //                   child: Text('Ок'),),
+      //             ],
+      //           )
+      //       );
+      // })
+       //   .then((_){
+       //  setState(() {
+       //    _isLoading = false;
+       //  });
+       //  Navigator.of(context).pop();
+      // }
+      // );
     }
 
     // Navigator.of(context).pop();

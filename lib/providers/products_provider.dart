@@ -69,21 +69,23 @@ class ProductsProvider with ChangeNotifier {
   //   notifyListeners();
   // }
 
-  Future<void> addProduct(Product product) {
+  /*асинхронный метод всегда возвращает  объект Future */
+  Future<void> addProduct(Product product) async{
     //final url = Uri.http('shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app','/products.json');
     final Uri url = Uri.parse(
         'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json');
-    return http
-        .post(url,
-            body: json.encode({
-              'title': product.title,
-              'description': product.description,
-              'imageUrl': product.imageUrl,
-              'price': product.price,
-              'isFavorite': product.isFavorite,
-            }))
-        .then((response) {
+    try {
+      final response = await http
+          .post(url,
+        body: json.encode({
+          'title': product.title,
+          'description': product.description,
+          'imageUrl': product.imageUrl,
+          'price': product.price,
+          'isFavorite': product.isFavorite,
+        }),);
       print(json.decode(response.body)); //{name: -key}
+
       final newProduct = Product(
           id: json.decode(response.body)['name'],
           //ункальный id, сгенерированный сервером
@@ -92,12 +94,28 @@ class ProductsProvider with ChangeNotifier {
           price: product.price,
           imageUrl: product.imageUrl);
       _items.add(newProduct);
-      //_items.insert(0, newProduct);
       notifyListeners(); //Обновить слушатели
-    }).catchError((error){
-      print(error);
-      throw error; //пробрасываем исключение в EditProductScreen
-    });
+    }
+    catch(error){
+          print(error);
+          throw error; //пробрасываем исключение в EditProductScreen
+    }
+       // .then((response) {
+      // print(json.decode(response.body)); //{name: -key}
+      //
+      // final newProduct = Product(
+      //     id: json.decode(response.body)['name'],
+      //     //ункальный id, сгенерированный сервером
+      //     title: product.title,
+      //     description: product.description,
+      //     price: product.price,
+      //     imageUrl: product.imageUrl);
+      // _items.add(newProduct);
+      //_items.insert(0, newProduct);
+      // notifyListeners(); //Обновить слушатели
+   // }).catchError((error){
+
+  //  });
   }
 
   void updateProduct(String id, Product newProduct) {
@@ -116,4 +134,4 @@ class ProductsProvider with ChangeNotifier {
   }
 }
 
-//
+
