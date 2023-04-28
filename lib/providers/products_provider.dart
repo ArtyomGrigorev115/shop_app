@@ -153,9 +153,23 @@ class ProductsProvider with ChangeNotifier {
   //  });
   }
 
-  void updateProduct(String id, Product newProduct) {
+  Future<void> updateProduct(String id, Product newProduct) async {
     final prodIndex = _items.indexWhere((product) => product.id == id);
     if (prodIndex >= 0) {
+
+      /*где id- это id редактируемого товара
+      * запрос на обновление данных patch(url, body)*/
+      final Uri url = Uri.parse(
+          'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+      await http.patch(
+          url,
+          body: json.encode({
+            'title': newProduct.title,
+            'description': newProduct.description,
+            'imageUrl': newProduct.imageUrl,
+            'price': newProduct.price,
+          }),
+      );
       _items[prodIndex] = newProduct;
       notifyListeners();
     } else {

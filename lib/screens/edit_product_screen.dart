@@ -114,7 +114,7 @@ class _EditProductScreenState extends State<EditProductScreen> {
 
     //обновить существующий товар, а не добавлять новый такой же
     if(_editedProduct.id.isNotEmpty){
-      Provider
+      /*await*/ Provider
           .of<ProductsProvider>(context, listen: false)
           .updateProduct(_editedProduct.id, _editedProduct);
       setState(() {
@@ -173,7 +173,10 @@ class _EditProductScreenState extends State<EditProductScreen> {
       // }
       // );
     }
-
+    // setState(() {
+    //   _isLoading = false;
+    // });
+    // Navigator.of(context).pop();
     // Navigator.of(context).pop();
   }
 
