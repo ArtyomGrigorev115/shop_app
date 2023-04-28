@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'dart:convert';
 import 'package:http/http.dart' as http;
+import 'package:shopapp/models/http_exception.dart';
 
 import 'product.dart';
 
@@ -177,34 +178,32 @@ class ProductsProvider with ChangeNotifier {
     }
   }
 
-  void deleteProduct(String id) {
+  Future<void> deleteProduct(String id) async {
 
     final Uri url = Uri.parse(
         'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
     final existingProductIndex = _items.indexWhere((product) => product.id == id);
     Product existingProduct = _items[existingProductIndex];
    // _items.removeWhere((product) => product.id == id);
-    http.delete(url)
-        .then((responce) {
-          print('delete responce: ${responce.statusCode}');
-
-          if(responce.statusCode >= 400){
-
-          }
-          existingProduct = Product(
-              id: 'mpt',
-              title: 'mpt',
-              description: 'mpt',
-              price: 0.0,
-              imageUrl: 'mpt');
-    })
-        .catchError((error){
-      _items.insert(existingProductIndex, existingProduct);
-      notifyListeners();
-    });
-
+    /*При возниконвении исключительной ситуации, например, некорректный uri ресурска
+    * товар не удаляется*/
     _items.removeAt(existingProductIndex);
     notifyListeners();
+    final responce = await http.delete(url);
+
+    print('delete responce: ${responce.statusCode}');
+    if(responce.statusCode >= 400){
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+      throw HttpException('Невозможно удалить товар.');
+    }
+
+    existingProduct = Product(
+        id: 'mpt',
+        title: 'mpt',
+        description: 'mpt',
+        price: 0.0,
+        imageUrl: 'mpt');
    // notifyListeners();
   }
 }
