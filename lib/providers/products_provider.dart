@@ -178,8 +178,34 @@ class ProductsProvider with ChangeNotifier {
   }
 
   void deleteProduct(String id) {
-    _items.removeWhere((product) => product.id == id);
+
+    final Uri url = Uri.parse(
+        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+    final existingProductIndex = _items.indexWhere((product) => product.id == id);
+    Product existingProduct = _items[existingProductIndex];
+   // _items.removeWhere((product) => product.id == id);
+    http.delete(url)
+        .then((responce) {
+          print('delete responce: ${responce.statusCode}');
+
+          if(responce.statusCode >= 400){
+
+          }
+          existingProduct = Product(
+              id: 'mpt',
+              title: 'mpt',
+              description: 'mpt',
+              price: 0.0,
+              imageUrl: 'mpt');
+    })
+        .catchError((error){
+      _items.insert(existingProductIndex, existingProduct);
+      notifyListeners();
+    });
+
+    _items.removeAt(existingProductIndex);
     notifyListeners();
+   // notifyListeners();
   }
 }
 
