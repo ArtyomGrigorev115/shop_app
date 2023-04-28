@@ -69,6 +69,23 @@ class ProductsProvider with ChangeNotifier {
   //   notifyListeners();
   // }
 
+  /*Получить данные из БД*/
+  Future<void> fetchAndSetProducts() async {
+    final Uri url = Uri.parse(
+        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+
+    try{
+      final response = await http.get(url);
+      print(json.decode(response.body));
+    }
+    catch(error){
+      rethrow;
+    }
+
+
+  }
+
+
   /*асинхронный метод всегда возвращает  объект Future */
   Future<void> addProduct(Product product) async{
     //final url = Uri.http('shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app','/products.json');
@@ -134,4 +151,4 @@ class ProductsProvider with ChangeNotifier {
   }
 }
 
-
+//

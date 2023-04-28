@@ -29,6 +29,26 @@ class ProductsOverviewScreen extends StatefulWidget {
 
 class _ProductsOverviewScreenState extends State<ProductsOverviewScreen> {
   bool _showOnlyFavorites = false;
+  bool _isInit = true;
+
+  //Получить записи из БД
+  // @override
+  // void initState() {
+   // Provider.of<ProductsProvider>(context).fetchAndSetProducts();
+   //  Future.delayed(Duration.zero).then((_) =>
+   //      Provider.of<ProductsProvider>(context).fetchAndSetProducts()
+   //  );
+    // super.initState();
+  // }
+
+  @override
+  void didChangeDependencies() {
+    if(_isInit){
+      Provider.of<ProductsProvider>(context).fetchAndSetProducts();
+    }
+    _isInit = false;
+    super.didChangeDependencies();
+  }
 
   @override
   Widget build(BuildContext context) {
