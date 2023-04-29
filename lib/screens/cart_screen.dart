@@ -38,14 +38,15 @@ class CartScreen extends StatelessWidget {
                     ),
                     backgroundColor: Theme.of(context).primaryColor,
                   ),
-                  TextButton(
-                      onPressed: (){
-                        Provider.of<Orders>(context, listen: false)
-                            .addOrder(cart.items.values.toList(), cart.totalAmount,);
-                        cart.clear();
-                      },
-                      child: Text('Оформить заказ')
-                  ),
+                  // TextButton(
+                  //     onPressed: cart.totalAmount <= 0 ? null : (){
+                  //       Provider.of<Orders>(context, listen: false)
+                  //           .addOrder(cart.items.values.toList(), cart.totalAmount,);
+                  //       cart.clear();
+                  //     },
+                  //     child: Text('Оформить заказ')
+                  // ),
+                  OrderButton(cart: cart),
                 ],
               ),
             ),
@@ -68,3 +69,37 @@ class CartScreen extends StatelessWidget {
     );
   }
 }
+
+class OrderButton extends StatefulWidget {
+  final Cart cart;
+  const OrderButton({required this.cart, Key? key}) : super(key: key);
+
+  @override
+  State<OrderButton> createState() => _OrderButtonState();
+}
+
+class _OrderButtonState extends State<OrderButton> {
+  var _isloading = false;
+  @override
+  Widget build(BuildContext context) {
+    return TextButton(
+        onPressed:  (widget.cart.totalAmount <= 0 || _isloading)
+            ? null
+            : () async {
+          setState(() {
+            _isloading = true;
+
+          });
+         await Provider.of<Orders>(context, listen: false)
+              .addOrder(widget.cart.items.values.toList(), widget.cart.totalAmount,);
+          setState(() {
+            _isloading = false;
+
+          });
+          widget.cart.clear();
+        },
+        child: _isloading ? CircularProgressIndicator() :Text('Оформить заказ')
+    );
+  }
+}
+
