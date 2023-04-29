@@ -80,8 +80,22 @@ class ProductsProvider with ChangeNotifier {
       print(json.decode(response.body));
 
       /*преобразуем данные из ответа в нужную форму*/
-      final extractedData = json.decode(response.body) as Map<String, dynamic>;
+     // final extractedData = json.decode(response.body) as Map<String, dynamic>;
+      Map<String, dynamic> extractedData = {};
+      if(json.decode(response.body) != null){
+        extractedData = json.decode(response.body) as Map<String, dynamic>;
+      }
+      else{
+        print('Товаров в базе нет');
+        return;
+      }
+
       final List<Product> loadedProducts = [];
+
+      // if(extractedData == null){
+      //   print('Нет товаров');
+      //   return;
+      // }
       extractedData.forEach((productId, productData) {
         loadedProducts.add(
             Product(

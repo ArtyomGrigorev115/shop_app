@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
 
@@ -26,6 +27,53 @@ class Orders with ChangeNotifier {
     return [..._orders];
   }
 
+  /**/
+  Future<void> fetchAndSetOrders() async {
+    final Uri url = Uri.parse(
+        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/orders.json');
+
+    final response = await http.get(url);
+    print('GET Заказы: ${response.body}');
+
+    final List<OrderItem> loadOrders = [];
+    //final Map<String, dynamic> extractData = json.decode(response.body) as Map<String, dynamic>;
+    Map<String, dynamic> extractData = {};
+    if(json.decode(response.body) != null){
+      extractData = json.decode(response.body) as Map<String, dynamic>;
+    }
+    else{
+      print('Заков в базе нет');
+      return;
+    }
+
+    // if(extractData == null){
+    //   print('Заков в базе нет');
+    //   return;
+    // }
+
+    extractData.forEach((orderId, orderData) {
+      loadOrders.add(
+          OrderItem(
+          id: orderId,
+          amount: orderData['amount'],
+          products: (orderData['products'] as List<dynamic>)
+              .map((item) => CartItem(
+              id: item['id'],
+              title: item['title'],
+              quantity: item['quantity'],
+              price: item['price'],
+          ),
+          ).toList(),
+
+          dateTime: DateTime.parse(orderData['dateTime']),
+      )
+      );
+    });
+    _orders = loadOrders.reversed.toList();
+    notifyListeners();
+  }
+
+
   /*POST -запросом добавляем "заказы" в БД и в локальный список заказов*/
   Future<void> addOrder(List<CartItem> cartProducts, double total) async {
 
@@ -44,7 +92,7 @@ class Orders with ChangeNotifier {
       }).toList()
     }),
     );
-    print('Заказ: ${response.body}');
+    print('POST Заказ: ${response.body}');
     /*Добавляем "заказ" в локальный список заказов,
     * где id заказа - это уникальный id, который пришёл в ответе сервера */
     _orders.insert(0, OrderItem(
