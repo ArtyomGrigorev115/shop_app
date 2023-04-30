@@ -17,20 +17,20 @@ class CartScreen extends StatelessWidget {
 
     return Scaffold(
       appBar: AppBar(
-        title: Text('Корзина'),
+        title: const Text('Корзина'),
       ),
       body: Column(
         children: [
           Card(
-            margin: EdgeInsets.all(15),
+            margin: const EdgeInsets.all(15),
             child: Padding(
-              padding: EdgeInsets.all(8),
+              padding: const EdgeInsets.all(8),
               child: Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Text('Всего', style: TextStyle(fontSize: 20,),),
+                  const Text('Всего', style: TextStyle(fontSize: 20,),),
                   //SizedBox(width: 10,),
-                  Spacer(),
+                  const Spacer(),
                   Chip(
                     label: Text(
                       '\$${cart.totalAmount.toStringAsFixed(2)}',
@@ -51,7 +51,7 @@ class CartScreen extends StatelessWidget {
               ),
             ),
           ),
-          SizedBox(height: 10,),
+          const SizedBox(height: 10,),
           Expanded(
               child: ListView.builder(
                 itemCount: cart.itemCount,
@@ -98,7 +98,7 @@ class _OrderButtonState extends State<OrderButton> {
           });
           widget.cart.clear();
         },
-        child: _isloading ? CircularProgressIndicator() :Text('Оформить заказ')
+        child: _isloading ? const CircularProgressIndicator() :const Text('Оформить заказ')
     );
   }
 }
