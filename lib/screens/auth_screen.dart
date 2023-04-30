@@ -1,6 +1,9 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+
+import '../providers/auth.dart';
 
 enum AuthMode { Signup, Login }
 
@@ -96,6 +99,7 @@ class AuthCard extends StatefulWidget {
 }
 
 class _AuthCardState extends State<AuthCard> {
+  //Глобальный ключ формы с полями для ввода инф. от пользователя
   final GlobalKey<FormState> _formKey = GlobalKey();
   AuthMode _authMode = AuthMode.Login;
   Map<String, String> _authData = {
@@ -105,9 +109,10 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
-  void _submit() {
+  Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
-      // Invalid!
+      // Валидация не пройдена
+      print('Невалид');
       return;
     }
     _formKey.currentState!.save();
@@ -115,9 +120,11 @@ class _AuthCardState extends State<AuthCard> {
       _isLoading = true;
     });
     if (_authMode == AuthMode.Login) {
-      // Log user in
+      // Логин пользователя
     } else {
-      // Sign user up
+      // Регистрация пользователя
+     await Provider.of<Auth>(context, listen: false).signup(_authData['email']!, _authData['password']!);
+
     }
     setState(() {
       _isLoading = false;
