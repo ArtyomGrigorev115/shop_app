@@ -3,6 +3,8 @@ import 'dart:math';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
+import 'package:shopapp/models/http_exception.dart';
+
 import '../providers/auth.dart';
 
 enum AuthMode { Signup, Login }
@@ -109,6 +111,19 @@ class _AuthCardState extends State<AuthCard> {
   var _isLoading = false;
   final _passwordController = TextEditingController();
 
+  /*Дилог  ошибкой*/
+  void _showErrorDialog(String message){
+    showDialog(context: context, builder: (builderContext) => AlertDialog(
+      title: const Text('Упс! Ошибочка'),
+      content: Text(message),
+      actions: [
+        TextButton(
+            onPressed: () => Navigator.of(builderContext).pop(),
+            child: const Text('Пон'),),
+      ],
+    ),);
+  }
+
   Future<void> _submit() async {
     if (!_formKey.currentState!.validate()) {
       // Валидация не пройдена
@@ -119,13 +134,40 @@ class _AuthCardState extends State<AuthCard> {
     setState(() {
       _isLoading = true;
     });
-    if (_authMode == AuthMode.Login) {
-      // Логин пользователя
-    } else {
-      // Регистрация пользователя
-     await Provider.of<Auth>(context, listen: false).signup(_authData['email']!, _authData['password']!);
 
+    try{
+      if (_authMode == AuthMode.Login) {
+        // Логин пользователя
+        await Provider.of<Auth>(context, listen: false).login(_authData['email']!, _authData['password']!);
+      } else {
+        // Регистрация пользователя
+        await Provider.of<Auth>(context, listen: false).signup(_authData['email']!, _authData['password']!);
+      }
+    } on HttpException catch(error){
+      String errorMessage = 'Ошибка!';
+
+     if(error.toString().contains('EMAIL_EXISTS')){
+       errorMessage = 'Такой e-mail адрес уже занят';
+     }
+     else if(error.toString().contains('EMAIL_NOT_FOUND')){
+       errorMessage = 'Введён несуществующий e-mail';
+     }
+     else if(error.toString().contains('INVALID_EMAIL')){
+       errorMessage = 'Введён некорректный e-mail';
+     }
+     else if(error.toString().contains('WEAK_PASSWORD')){
+       errorMessage = 'Недостаточно надёжный пароль';
+     }
+     else if(error.toString().contains('INVALID_PASSWORD')){
+       errorMessage = 'Неправильный пароль';
+     }
+     _showErrorDialog(errorMessage);
+    } catch(error){
+      const String errorMessage = 'Непредвиденная ошибка. Попробуйте позже';
+      _showErrorDialog(errorMessage);
     }
+
+
     setState(() {
       _isLoading = false;
     });
@@ -156,7 +198,7 @@ class _AuthCardState extends State<AuthCard> {
         constraints:
             BoxConstraints(minHeight: _authMode == AuthMode.Signup ? 320 : 260),
         width: deviceSize.width * 0.75,
-        padding: EdgeInsets.all(16.0),
+        padding: const EdgeInsets.all(16.0),
         child: Form(
           key: _formKey,
           child: SingleChildScrollView(
@@ -234,7 +276,7 @@ class _AuthCardState extends State<AuthCard> {
                     textStyle: TextStyle(color: Theme.of(context).primaryColor,)
                   ),
                   child: Text(
-                      '${_authMode == AuthMode.Login ? 'Регистрация' : 'Войти'} INSTEAD'),
+                      '${_authMode == AuthMode.Login ? 'Регистрация' : 'Войти'} Попробовать'),
 
                  // materialTapTargetSize: MaterialTapTargetSize.shrinkWrap,
                  // textColor: Theme.of(context).primaryColor,
