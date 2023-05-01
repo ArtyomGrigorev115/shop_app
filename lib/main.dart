@@ -29,7 +29,7 @@ class MyApp extends StatelessWidget {
         /*Использовал Прокси провайдер,
         для того, что бы вытащить токен аутентификации */
         ChangeNotifierProxyProvider<Auth, ProductsProvider>(
-    create: (_)=> ProductsProvider("",[
+    create: (_)=> ProductsProvider("","" ,[
       // Product(
       //     id: 'p1',
       //     title: 'title',
@@ -37,7 +37,7 @@ class MyApp extends StatelessWidget {
       //     price: 34.56,
       //     imageUrl: 'https://live.staticflickr.com/65535/50124850593_c80347ae94_z.jpg')
     ]),
-    update: (ctx,auth, previousProducts) => ProductsProvider(auth.token!, previousProducts == null ?[] : previousProducts.items),),
+    update: (ctx,auth, previousProducts) => ProductsProvider(auth.token!, auth.userId ,previousProducts == null ?[] : previousProducts.items),),
 
         ChangeNotifierProvider(create: (ctx) => Cart(),),
         ChangeNotifierProxyProvider<Auth, Orders>(

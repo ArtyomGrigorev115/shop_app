@@ -44,8 +44,9 @@ class ProductsProvider with ChangeNotifier {
 
   bool _showFavoritiesOnly = false;
   final String authToken;
+  final String userId;
 
-  ProductsProvider(this.authToken, this._items);
+  ProductsProvider(this.authToken, this.userId, this._items);
 
   /*Возвращает копию списка товаров*/
   List<Product> get items {
@@ -75,7 +76,7 @@ class ProductsProvider with ChangeNotifier {
 
   /*Получить данные из БД*/
   Future<void> fetchAndSetProducts() async {
-    final Uri url = Uri.parse(
+     Uri url = Uri.parse(
         'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken');
 
     try{
@@ -92,6 +93,11 @@ class ProductsProvider with ChangeNotifier {
         print('Товаров в базе нет');
         return;
       }
+      /*запрс ибранных товаров*/
+       url = Uri.parse(
+          'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/userFavorites/$userId.json?auth=$authToken');
+      final favoriteResponse = await http.get(url);
+      final favoriteData = json.decode(favoriteResponse.body);
 
       final List<Product> loadedProducts = [];
 
@@ -107,7 +113,8 @@ class ProductsProvider with ChangeNotifier {
                 description: productData['description'],
                 price: productData['price'],
                 imageUrl: productData['imageUrl'],
-                isFavorite: productData['isFavorite'],
+
+                isFavorite: favoriteData == null ? false : favoriteData[productId] ?? false,
             )
         );
       });
@@ -135,7 +142,7 @@ class ProductsProvider with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
-          'isFavorite': product.isFavorite,
+        //  'isFavorite': product.isFavorite,
         }),);
       print(json.decode(response.body)); //{name: -key}
 

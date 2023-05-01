@@ -34,6 +34,10 @@ class Auth with ChangeNotifier {
     return null;
   }
 
+  String get userId{
+    return _userId!;
+  }
+
   Future<void> _authenticate(String email, String password, String urlSegment) async {
     final Uri url = Uri.parse(
         'https://identitytoolkit.googleapis.com/v1/$urlSegment?key=AIzaSyDQPViQYT2v8Qpakgwr5H36H2HfxRBHWTM');

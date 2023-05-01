@@ -29,20 +29,21 @@ class Product with ChangeNotifier {
    * убрать из избранного
    * Если добавить в избранное невозможно,
    * то происходит возврат в начальное состояние*/
-   Future<void> toggleFavoriteStatus(String token) async {
+   Future<void> toggleFavoriteStatus(String token, String userId) async {
      final oldStatus = isFavorite;
      isFavorite = !isFavorite;
      notifyListeners(); //обновить состояние
 
      final Uri url = Uri.parse(
-         'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$token');
+         'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/userFavorites/$userId/$id.json?auth=$token');
 
-     /*изменяем статус избранного на сервере
-     * PATCH запросом*/
+     /*изменяем статус избранного товара на сервере
+     * PUT запросом
+      -NUB8o8_skvtzsEmMLoh:false | true*/
      try{
-       final responce = await http.patch(url, body: json.encode({
-         'isFavorite': isFavorite,
-       }));
+       final responce = await http.put(url, body: json.encode(
+          isFavorite,
+       ),);
 
        if(responce.statusCode >= 400){
          _setFavoriteValue(oldStatus);
