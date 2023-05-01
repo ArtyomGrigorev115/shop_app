@@ -21,7 +21,7 @@ class _OrderItemState extends State<OrderItem> {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: EdgeInsets.all(10),
+      margin: const EdgeInsets.all(10),
       child: Column(
         children: [
           ListTile(
@@ -37,15 +37,15 @@ class _OrderItemState extends State<OrderItem> {
             ),
           ),
           if(_expanded) Container(
-            padding: EdgeInsets.symmetric(horizontal: 15, vertical: 4),
+            padding: const EdgeInsets.symmetric(horizontal: 15, vertical: 4),
             height: min(widget.order.products.length * 20.0 + 10, 100), //высота высчитывается динамически
             child: ListView.builder(
                 itemCount: widget.order.products.length,
                 itemBuilder: (ctx, index) => Row(
                   mainAxisAlignment: MainAxisAlignment.spaceBetween,
                   children: [
-                  Text(widget.order.products[index].title, style: TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
-                  Text('${widget.order.products[index].quantity}x \$${widget.order.products[index].price}', style: TextStyle(fontSize: 18, color: Colors.grey),),
+                  Text(widget.order.products[index].title, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold),),
+                  Text('${widget.order.products[index].quantity}x \$${widget.order.products[index].price}', style: const TextStyle(fontSize: 18, color: Colors.grey),),
 
                 ],),
             ),

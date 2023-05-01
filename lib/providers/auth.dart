@@ -18,6 +18,22 @@ class Auth with ChangeNotifier {
   /*идентификатор залогиненого пользователя*/
   String? _userId;
 
+  /*пользователь аутентифицирован?
+  * если есть токен и  срок действия токена не истёк,
+  * тогда пользователь утентифицирован*/
+  bool get isAuth{
+      return token != null;
+  }
+
+  String? get token{
+    if(_expityDate != null && _token != null){
+      if(_expityDate!.isAfter(DateTime.now())){
+        return _token!;
+      }
+    }
+    return null;
+  }
+
   Future<void> _authenticate(String email, String password, String urlSegment) async {
     final Uri url = Uri.parse(
         'https://identitytoolkit.googleapis.com/v1/$urlSegment?key=AIzaSyDQPViQYT2v8Qpakgwr5H36H2HfxRBHWTM');
@@ -34,7 +50,12 @@ class Auth with ChangeNotifier {
         print('ОШИБКА!!! $responseData');
         throw HttpException(responseData['error']['message']);
       }
+      /*из ответа сервера вытаскиеваем токен, userId, время действия токена */
+      _token = responseData['idToken'];
+      _userId = responseData['localId'];
+      _expityDate = DateTime.now().add(Duration(seconds: int.parse(responseData['expiresIn'])));
 
+      notifyListeners();
       if(urlSegment == 'accounts:signUp'){
         print('регистрация ответ:  $urlSegment  ${json.decode(response.body)}');
       }

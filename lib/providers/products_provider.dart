@@ -43,6 +43,9 @@ class ProductsProvider with ChangeNotifier {
   ];
 
   bool _showFavoritiesOnly = false;
+  final String authToken;
+
+  ProductsProvider(this.authToken, this._items);
 
   /*Возвращает копию списка товаров*/
   List<Product> get items {
@@ -73,7 +76,7 @@ class ProductsProvider with ChangeNotifier {
   /*Получить данные из БД*/
   Future<void> fetchAndSetProducts() async {
     final Uri url = Uri.parse(
-        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken');
 
     try{
       final response = await http.get(url);
@@ -123,7 +126,7 @@ class ProductsProvider with ChangeNotifier {
   Future<void> addProduct(Product product) async{
     //final url = Uri.http('shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app','/products.json');
     final Uri url = Uri.parse(
-        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json');
+        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken');
     try {
       final response = await http
           .post(url,
@@ -175,7 +178,7 @@ class ProductsProvider with ChangeNotifier {
       /*где id- это id редактируемого товара
       * запрос на обновление данных patch(url, body)*/
       final Uri url = Uri.parse(
-          'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+          'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$authToken');
       await http.patch(
           url,
           body: json.encode({
@@ -195,7 +198,7 @@ class ProductsProvider with ChangeNotifier {
   Future<void> deleteProduct(String id) async {
 
     final Uri url = Uri.parse(
-        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json');
+        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products/$id.json?auth=$authToken');
     final existingProductIndex = _items.indexWhere((product) => product.id == id);
     Product existingProduct = _items[existingProductIndex];
    // _items.removeWhere((product) => product.id == id);
