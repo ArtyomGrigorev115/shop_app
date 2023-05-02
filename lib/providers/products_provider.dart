@@ -75,9 +75,11 @@ class ProductsProvider with ChangeNotifier {
   // }
 
   /*Получить данные из БД*/
-  Future<void> fetchAndSetProducts() async {
+  Future<void> fetchAndSetProducts([bool filterByUser = false]) async {
+    final filterString = filterByUser ? 'orderBy="creatorId"&equalTo="$userId"' : '';
+
      Uri url = Uri.parse(
-        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken');
+        'https://shopapp-67ba1-default-rtdb.europe-west1.firebasedatabase.app/products.json?auth=$authToken&$filterString');
 
     try{
       final response = await http.get(url);
@@ -142,6 +144,7 @@ class ProductsProvider with ChangeNotifier {
           'description': product.description,
           'imageUrl': product.imageUrl,
           'price': product.price,
+          'creatorId': userId,
         //  'isFavorite': product.isFavorite,
         }),);
       print(json.decode(response.body)); //{name: -key}
