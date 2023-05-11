@@ -37,12 +37,13 @@ class MyApp extends StatelessWidget {
       //     price: 34.56,
       //     imageUrl: 'https://live.staticflickr.com/65535/50124850593_c80347ae94_z.jpg')
     ]),
-    update: (ctx,auth, previousProducts) => ProductsProvider(auth.token!, auth.userId ,previousProducts == null ?[] : previousProducts.items),),
+    update: (ctx,auth, previousProducts) => ProductsProvider(auth.token ?? "", auth.userId ,previousProducts == null ?[] : previousProducts.items),),
 
         ChangeNotifierProvider(create: (ctx) => Cart(),),
+
         ChangeNotifierProxyProvider<Auth, Orders>(
-          create: (_) => Orders("", []),
-            update: (ctx, auth, previousOrders) => Orders(auth.token!, previousOrders == null ? [] : previousOrders.orders)),
+          create: (_) => Orders("", "",[]),
+            update: (ctx, auth, previousOrders) => Orders(auth.token ?? "", auth.userId ,previousOrders == null ? [] : previousOrders.orders)),
     ],
 
       child: Consumer<Auth>(

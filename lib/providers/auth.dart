@@ -105,4 +105,12 @@ class Auth with ChangeNotifier {
     // print('логин ответ: ${json.decode(response.body)}');
     return _authenticate(email, password, 'accounts:signInWithPassword');
   }
+
+  //логаут метод
+void logout(){
+    _token = null;
+    _userId = '';
+    _expityDate = DateTime.now().subtract(const Duration(seconds: 31536000));
+    notifyListeners();
+}
 }
