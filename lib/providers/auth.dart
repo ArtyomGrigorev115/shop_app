@@ -3,6 +3,7 @@ import 'dart:convert';
 import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopapp/models/http_exception.dart';
+import 'dart:async';
 
 /*
 * AIzaSyDQPViQYT2v8Qpakgwr5H36H2HfxRBHWTM
@@ -17,6 +18,8 @@ class Auth with ChangeNotifier {
 
   /*идентификатор залогиненого пользователя*/
   String? _userId;
+
+   Timer? _authTimer;
 
   /*пользователь аутентифицирован?
   * если есть токен и  срок действия токена не истёк,
@@ -58,6 +61,7 @@ class Auth with ChangeNotifier {
       _token = responseData['idToken'];
       _userId = responseData['localId'];
       _expityDate = DateTime.now().add(Duration(seconds: int.parse(responseData['expiresIn'])));
+      _autoLogout();
 
       notifyListeners();
       if(urlSegment == 'accounts:signUp'){
@@ -111,6 +115,21 @@ void logout(){
     _token = null;
     _userId = '';
     _expityDate = DateTime.now().subtract(const Duration(seconds: 31536000));
+    if(_authTimer != null){
+      _authTimer!.cancel();
+      _authTimer = null;
+    }
+    print('автовыход');
     notifyListeners();
+}
+
+/*Автовыход по таймеру*/
+void _autoLogout(){
+  if(_authTimer != null){
+    _authTimer!.cancel();
+  }
+
+   final timeToExpiry =  _expityDate?.difference(DateTime.now()).inSeconds;
+   _authTimer =  Timer(Duration(seconds: timeToExpiry!),  logout);
 }
 }
