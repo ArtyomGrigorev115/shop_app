@@ -4,6 +4,7 @@ import 'package:shopapp/providers/auth.dart';
 import 'package:shopapp/providers/cart.dart';
 import 'package:shopapp/providers/orders.dart';
 import 'package:shopapp/providers/product.dart';
+import 'package:shopapp/screens/splash_screen.dart';
 import 'package:shopapp/screens/cart_screen.dart';
 import 'package:shopapp/screens/edit_product_screen.dart';
 import 'package:shopapp/screens/orders_screen.dart';
@@ -56,7 +57,9 @@ class MyApp extends StatelessWidget {
                   .copyWith(secondary: Colors.deepOrange),
               fontFamily: 'Lato',
             ),
-            home: auth.isAuth ? ProductsOverviewScreen() :  AuthScreen(),
+            home: auth.isAuth
+                ? ProductsOverviewScreen()
+                : AuthScreen(),
             routes: {
               ProductDetailScreen.routeName: (ctx) => ProductDetailScreen(),
               CartScreen.routeName: (ctx) => CartScreen(),

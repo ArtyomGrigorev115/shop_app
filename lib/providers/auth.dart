@@ -4,6 +4,7 @@ import 'package:flutter/widgets.dart';
 import 'package:http/http.dart' as http;
 import 'package:shopapp/models/http_exception.dart';
 import 'dart:async';
+import 'package:shared_preferences/shared_preferences.dart';
 
 /*
 * AIzaSyDQPViQYT2v8Qpakgwr5H36H2HfxRBHWTM
@@ -14,7 +15,7 @@ class Auth with ChangeNotifier {
   String? _token;
 
   /*Время действи токена*/
-  DateTime? _expityDate;
+  DateTime? _expiryDate;
 
   /*идентификатор залогиненого пользователя*/
   String? _userId;
@@ -29,8 +30,8 @@ class Auth with ChangeNotifier {
   }
 
   String? get token{
-    if(_expityDate != null && _token != null){
-      if(_expityDate!.isAfter(DateTime.now())){
+    if(_expiryDate != null && _token != null){
+      if(_expiryDate!.isAfter(DateTime.now())){
         return _token!;
       }
     }
@@ -60,10 +61,20 @@ class Auth with ChangeNotifier {
       /*из ответа сервера вытаскиеваем токен, userId, время действия токена */
       _token = responseData['idToken'];
       _userId = responseData['localId'];
-      _expityDate = DateTime.now().add(Duration(seconds: int.parse(responseData['expiresIn'])));
+      _expiryDate = DateTime.now().add(Duration(seconds: int.parse(responseData['expiresIn'])));
       _autoLogout();
 
       notifyListeners();
+
+      /*храним ключ => значение в shared preferences*/
+      final prefs = await SharedPreferences.getInstance();
+      final String userData =  json.encode({
+        'token': _token,
+        'userId': _userId,
+        'expiryDate':_expiryDate?.toIso8601String(),});
+      prefs.setString('userData', userData);
+      print('AUTHENTIFICATE $prefs');
+
       if(urlSegment == 'accounts:signUp'){
         print('регистрация ответ:  $urlSegment  ${json.decode(response.body)}');
       }
@@ -110,11 +121,37 @@ class Auth with ChangeNotifier {
     return _authenticate(email, password, 'accounts:signInWithPassword');
   }
 
+  Future<bool> tryAutologin() async{
+    print('метод tryToLogin');
+    final prefs = await SharedPreferences.getInstance();
+    if (!prefs.containsKey('userData')) {
+      print('НЕТ ШАРЕДА');
+      return false;
+    }
+    print('ЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫ1111111111111111');
+    final extractedUserData = json.decode(prefs.getString('userData')!) as Map<String, Object>;
+    print('tryToLogIn() extractedUserData $extractedUserData');
+    final expiryDate = DateTime.parse(extractedUserData['expiryDate'] as String);
+    print('ZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZZ');
+    if (expiryDate.isBefore(DateTime.now())) {
+
+      return false;
+    }
+    print('ЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫЫ222222222222222222222222');
+    _token = extractedUserData['token'] as String?;
+    _userId = extractedUserData['userId'] as String?;
+    _expiryDate = expiryDate;
+    notifyListeners();
+    _autoLogout();
+    return true;
+  }
+
+
   //логаут метод
 void logout(){
     _token = null;
     _userId = '';
-    _expityDate = DateTime.now().subtract(const Duration(seconds: 31536000));
+    _expiryDate = DateTime.now().subtract(const Duration(seconds: 31536000));
     if(_authTimer != null){
       _authTimer!.cancel();
       _authTimer = null;
@@ -129,7 +166,7 @@ void _autoLogout(){
     _authTimer!.cancel();
   }
 
-   final timeToExpiry =  _expityDate?.difference(DateTime.now()).inSeconds;
+   final timeToExpiry =  _expiryDate?.difference(DateTime.now()).inSeconds;
    _authTimer =  Timer(Duration(seconds: timeToExpiry!),  logout);
 }
 }
